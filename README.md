@@ -1,4 +1,4 @@
 SAP-Incident-Charting
 =====================
 
-Charting SAP incidents from the SAP customer support site
+Charting incidents from the SAP customer support site - you get priorities, dates, etc etc. What I'm after is a better way to chart them.
