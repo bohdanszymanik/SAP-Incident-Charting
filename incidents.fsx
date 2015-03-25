@@ -150,6 +150,47 @@ for i = 0 to int medHistogram.BucketCount - 1 do
 //
 // Approach 2 - use Deedle and work in a dataframe
 //
+// actually this looks better!
+//
+// Approach 2 - use Deedle and work in a dataframe
+//
+
+#I "../packages/FSharp.Charting.0.90.9"
+#I "../packages/Deedle.1.0.7"
+#I "../packages/MathNet.Numerics.FSharp.3.5.0"
+#load "MathNet.Numerics.fsx"
+#load "FSharp.Charting.fsx"
+#load "Deedle.fsx"
+
+open System
+open Deedle
+
+
+let incidentsD = Frame.ReadCsv(__SOURCE_DIRECTORY__ + "\messages_20150323.tsv")
+let t = incidentsD |> Frame.filterRowValues (fun row -> ["Not Sent to SAP"; "Confirmed"; "Confirmed Automatically"; "Solution Provided"] |> List.contains (row.GetAs<string>("Status")) |> not )
+
+// these work the same way
+incidentsD.Columns.["Created on"]
+incidentsD.GetColumn<string>("Created on")
+// ? operator only works on numeric types
+// incidentsD?("Created on")
+
+// this returns all the column series
+incidentsD.Columns
+
+// so how do we get the number of days since an incident was created?
+// string and then perform conversion?
+#r @"..\packages\NodaTime.1.3.0\lib\net35-Client\NodaTime.dll"
+open NodaTime
+
+let now = SystemClock.Instance.Now
+let tz = DateTimeZoneProviders.Bcl.GetSystemDefault()
+let localNow = now.InZone(tz).LocalDateTime
+
+incidentsD.GetColumn<string>("Created on")
+|> Series.mapValues ( fun v -> 
+                            Period.Between(pattern.Parse(v).Value , localNow).Days )
+
 
 
 
